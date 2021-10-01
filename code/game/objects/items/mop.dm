@@ -14,7 +14,7 @@
 	resistance_flags = FLAMMABLE
 	var/mopping = 0
 	var/mopcount = 0
-	var/mopcap = 15
+	var/mopcap = 50
 	var/mopspeed = 15
 	force_string = "robust... against germs"
 	var/insertable = TRUE
@@ -22,6 +22,19 @@
 /obj/item/mop/Initialize()
 	. = ..()
 	create_reagents(mopcap)
+	AddElement(/datum/element/liquids_interaction, on_interaction_callback = /obj/item/mop/.proc/attack_on_liquids_turf)
+
+/obj/item/mop/proc/attack_on_liquids_turf(obj/item/mop/the_mop, turf/T, mob/user, obj/effect/abstract/liquid_turf/liquids)
+	var/free_space = the_mop.reagents.maximum_volume - the_mop.reagents.total_volume
+	if(free_space <= 0)
+		to_chat(user, "<span class='warning'>Your mop can't absorb any more!</span>")
+		return TRUE
+	var/datum/reagents/tempr = liquids.take_reagents_flat(free_space)
+	tempr.trans_to(the_mop.reagents, tempr.total_volume)
+	to_chat(user, "<span class='notice'>You soak the mop with some liquids.</span>")
+	qdel(tempr)
+	user.changeNext_move(CLICK_CD_MELEE)
+	return TRUE
 
 
 /obj/item/mop/proc/clean(turf/A, mob/living/cleaner)
@@ -39,6 +52,8 @@
 
 /obj/item/mop/afterattack(atom/A, mob/user, proximity)
 	. = ..()
+	if(.)
+		return
 	if(!proximity)
 		return
 
@@ -81,7 +96,7 @@
 /obj/item/mop/advanced
 	desc = "The most advanced tool in a custodian's arsenal, complete with a condenser for self-wetting! Just think of all the viscera you will clean up with this!"
 	name = "advanced mop"
-	mopcap = 10
+	mopcap = 100
 	icon_state = "advmop"
 	item_state = "mop"
 	lefthand_file = 'icons/mob/inhands/equipment/custodial_lefthand.dmi'

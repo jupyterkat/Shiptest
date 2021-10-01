@@ -244,7 +244,7 @@
 			if(method)
 				R.expose_single(T, target_atom, method, part, show_message)
 				T.on_transfer(target_atom, method, transfer_amount * multiplier)
-			remove_reagent(T.type, transfer_amount)
+			remove_reagent(T.type, transfer_amount, no_react)
 			transfer_log[T.type] = transfer_amount
 	else
 		var/to_transfer = amount
@@ -264,7 +264,7 @@
 			if(method)
 				R.expose_single(T, target_atom, method, transfer_amount, show_message)
 				T.on_transfer(target_atom, method, transfer_amount * multiplier)
-			remove_reagent(T.type, transfer_amount)
+			remove_reagent(T.type, transfer_amount, no_react)
 			transfer_log[T.type] = transfer_amount
 
 	if(transfered_by && target_atom)
@@ -279,7 +279,7 @@
 	return amount
 
 /// Copies the reagents to the target object
-/datum/reagents/proc/copy_to(obj/target, amount=1, multiplier=1, preserve_data=1)
+/datum/reagents/proc/copy_to(obj/target, amount=1, multiplier=1, preserve_data=1, no_react=0)
 	var/list/cached_reagents = reagent_list
 	if(!target || !total_volume)
 		return
@@ -306,8 +306,9 @@
 
 	src.update_total()
 	R.update_total()
-	R.handle_reactions()
-	src.handle_reactions()
+	if(!no_react)
+		R.handle_reactions()
+		src.handle_reactions()
 	return amount
 
 /// Transfer a specific reagent id to the target object
@@ -795,13 +796,15 @@
 	return TRUE
 
 /// Like add_reagent but you can enter a list. Format it like this: list(/datum/reagent/toxin = 10, "beer" = 15)
-/datum/reagents/proc/add_reagent_list(list/list_reagents, list/data=null)
+/datum/reagents/proc/add_reagent_list(list/list_reagents, list/data=null, no_react = FALSE)
 	for(var/r_id in list_reagents)
 		var/amt = list_reagents[r_id]
-		add_reagent(r_id, amt, data)
+		add_reagent(r_id, amt, data, no_react = TRUE)
+	if(!no_react)
+		handle_reactions()
 
 /// Remove a specific reagent
-/datum/reagents/proc/remove_reagent(reagent, amount, safety)//Added a safety check for the trans_id_to
+/datum/reagents/proc/remove_reagent(reagent, amount, safety, no_react = FALSE)//Added a safety check for the trans_id_to
 
 	if(isnull(amount))
 		amount = 0
@@ -823,7 +826,7 @@
 			amount = clamp(amount, 0, R.volume)
 			R.volume -= amount
 			update_total()
-			if(!safety)//So it does not handle reactions when it need not to
+			if(!safety || !no_react)//So it does not handle reactions when it need not to
 				handle_reactions()
 			if(my_atom)
 				my_atom.on_reagent_change(REM_REAGENT)

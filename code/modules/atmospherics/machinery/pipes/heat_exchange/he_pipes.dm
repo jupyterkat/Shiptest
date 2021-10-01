@@ -27,6 +27,8 @@
 	if(istype(T))
 		if(islava(T))
 			environment_temperature = 5000
+		else if (T.liquids && T.liquids.liquid_state >= LIQUID_STATE_FOR_HEAT_EXCHANGERS)
+			environment_temperature = T.liquids.temp
 		else if(T.blocks_air)
 			environment_temperature = T.return_temperature()
 		else

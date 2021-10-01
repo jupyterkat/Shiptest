@@ -73,8 +73,12 @@ DEFINE_BITFIELD(smoothing_flags, list(
 #define SMOOTH_GROUP_BOSS_WALLS S_TURF(29) ///turf/closed/indestructible/riveted/boss
 #define SMOOTH_GROUP_SURVIVAL_TITANIUM_WALLS S_TURF(30)	///turf/closed/wall/mineral/titanium/survival
 
-#define MAX_S_TURF SMOOTH_GROUP_SURVIVAL_TITANIUM_WALLS //Always match this value with the one above it.
+#define SMOOTH_GROUP_ELEVATED_PLASTEEL S_TURF(31)
+#define SMOOTH_GROUP_LOWERED_PLASTEEL S_TURF(32)
 
+#define SMOOTH_GROUP_FISSURE S_TURF(33)
+
+#define MAX_S_TURF SMOOTH_GROUP_FISSURE //Always match this value with the one above it.
 
 #define S_OBJ(num) (MAX_S_TURF + 1 + num)
 /* /obj included */
@@ -130,6 +134,9 @@ DEFINE_BITFIELD(smoothing_flags, list(
 
 #define SMOOTH_GROUP_INDUSTRIAL_LIFT S_OBJ(70) ///obj/structure/industrial_lift
 
+#define SMOOTH_GROUP_WATER S_OBJ(71) ///obj/effect/abstract/liquid_turf
+
+
 // WS Begin: Custom WS Smoothing Groups
 #define MAX_S_OBJ_NON_WS SMOOTH_GROUP_CLEANABLE_DIRT //Always match this value with the one above it.
 
@@ -142,5 +149,5 @@ DEFINE_BITFIELD(smoothing_flags, list(
 #define SMOOTH_GROUP_CARPET_NWORANGE WS_S_OBJ(4) ///obj/item/stack/tile/carpet/nanoweave/orange
 #define SMOOTH_GROUP_CARPET_NWBEIGE WS_S_OBJ(5) ///obj/item/stack/tile/carpet/nanoweave/beige
 
-#define MAX_S_OBJ SMOOTH_GROUP_CARPET_NWBEIGE //Always match this value with the one above it.
+#define MAX_S_OBJ SMOOTH_GROUP_WATER //Always match this value with the one above it.
 // WS End

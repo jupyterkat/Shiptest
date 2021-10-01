@@ -1969,6 +1969,13 @@ GLOBAL_LIST_EMPTY(roundstart_races)
 	var/body_temperature_difference = H.get_body_temp_normal() - body_temp
 	var/natural_change = 0
 
+	//Special handling for getting liquids temperature
+	if(isturf(H.loc))
+		var/turf/T = H.loc
+		if(T.liquids && T.liquids.liquid_state > LIQUID_STATE_PUDDLE)
+			var/submergment_percent = SUBMERGEMENT_PERCENT(H, T.liquids)
+			areatemp = (areatemp*(1-submergment_percent)) + (T.liquids.temp * submergment_percent)
+
 	// We are very cold, increate body temperature
 	if(body_temp <= bodytemp_cold_damage_limit)
 		natural_change = max((body_temperature_difference * H.metabolism_efficiency / BODYTEMP_AUTORECOVERY_DIVISOR), \

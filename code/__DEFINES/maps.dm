@@ -98,6 +98,10 @@ require only minor tweaks.
 	ZTRAIT_UP = 1, \
 	ZTRAIT_BASETURF = /turf/open/lava/plasma/ice_moon)
 
+#define ZTRAITS_OCEAN_LEVEL list(ZTRAIT_GRAVITY = TRUE,ZTRAIT_BASETURF = /turf/open/floor/plating/asteroid,ZTRAIT_OCEAN_RUINS = TRUE)
+
+#define ZTRAITS_TRENCH_LEVEL list(ZTRAIT_GRAVITY = TRUE,ZTRAIT_BASETURF = /turf/open/floor/plating/asteroid,ZTRAIT_TRENCH_RUINS = TRUE)
+
 #define DL_NAME "name"
 #define DL_TRAITS "traits"
 #define DECLARE_LEVEL(NAME, TRAITS) list(DL_NAME = NAME, DL_TRAITS = TRAITS)

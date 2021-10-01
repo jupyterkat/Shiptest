@@ -153,42 +153,55 @@
 
 	if(isopenturf(target))
 
-		var/turf/open/modeled_location = target
-		target_temperature = modeled_location.GetTemperature()
-		target_heat_capacity = modeled_location.GetHeatCapacity()
+		if(target.liquids && target.liquids.liquid_state >= LIQUID_STATE_FOR_HEAT_EXCHANGERS)
+			target_temperature = target.liquids.temp
+			target_heat_capacity = target.liquids.total_reagents * REAGENT_HEAT_CAPACITY
+			var/delta_temperature = (air.return_temperature() - target_temperature)
 
-		if(modeled_location.blocks_air)
+			if(target_heat_capacity <= 0 || partial_heat_capacity <= 0)
+				return TRUE
 
-			if((modeled_location.heat_capacity>0) && (partial_heat_capacity>0))
-				var/delta_temperature = air.return_temperature() - target_temperature
+			var/heat = thermal_conductivity * delta_temperature * (partial_heat_capacity * target_heat_capacity / (partial_heat_capacity + target_heat_capacity))
 
-				var/heat = thermal_conductivity*delta_temperature* \
-					(partial_heat_capacity*target_heat_capacity/(partial_heat_capacity+target_heat_capacity))
-
-				air.set_temperature(air.return_temperature() - heat/total_heat_capacity)
-				modeled_location.TakeTemperature(heat/target_heat_capacity)
-
+			air.return_temperature() -= heat / total_heat_capacity
+			if(!target.liquids.immutable)
+				target.liquids.temp += heat / target_heat_capacity
 		else
-			var/delta_temperature = 0
-			var/sharer_heat_capacity = 0
+			var/turf/open/modeled_location = target
+			target_temperature = modeled_location.GetTemperature()
+			target_heat_capacity = modeled_location.GetHeatCapacity()
+			if(modeled_location.blocks_air)
 
-			delta_temperature = (air.return_temperature() - target_temperature)
-			sharer_heat_capacity = target_heat_capacity
+				if((modeled_location.heat_capacity>0) && (partial_heat_capacity>0))
+					var/delta_temperature = air.return_temperature() - target_temperature
 
-			var/self_temperature_delta = 0
-			var/sharer_temperature_delta = 0
+					var/heat = thermal_conductivity*delta_temperature* \
+						(partial_heat_capacity*target_heat_capacity/(partial_heat_capacity+target_heat_capacity))
 
-			if((sharer_heat_capacity>0) && (partial_heat_capacity>0))
-				var/heat = thermal_conductivity*delta_temperature* \
-					(partial_heat_capacity*sharer_heat_capacity/(partial_heat_capacity+sharer_heat_capacity))
+					air.set_temperature(air.return_temperature() - heat/total_heat_capacity)
+					modeled_location.TakeTemperature(heat/target_heat_capacity)
 
-				self_temperature_delta = -heat/total_heat_capacity
-				sharer_temperature_delta = heat/sharer_heat_capacity
 			else
-				return 1
+				var/delta_temperature = 0
+				var/sharer_heat_capacity = 0
 
-			air.set_temperature(air.return_temperature() + self_temperature_delta)
-			modeled_location.TakeTemperature(sharer_temperature_delta)
+				delta_temperature = (air.return_temperature() - target_temperature)
+				sharer_heat_capacity = target_heat_capacity
+
+				var/self_temperature_delta = 0
+				var/sharer_temperature_delta = 0
+
+				if((sharer_heat_capacity>0) && (partial_heat_capacity>0))
+					var/heat = thermal_conductivity*delta_temperature* \
+						(partial_heat_capacity*sharer_heat_capacity/(partial_heat_capacity+sharer_heat_capacity))
+
+					self_temperature_delta = -heat/total_heat_capacity
+					sharer_temperature_delta = heat/sharer_heat_capacity
+				else
+					return 1
+
+				air.set_temperature(air.return_temperature() + self_temperature_delta)
+				modeled_location.TakeTemperature(sharer_temperature_delta)
 
 
 	else

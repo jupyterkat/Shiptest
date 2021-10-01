@@ -205,6 +205,9 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_NICE_SHOT "nice_shot" //hnnnnnnnggggg..... you're pretty good....
 /// The holder of this trait has antennae or whatever that hurt a ton when noogied
 #define TRAIT_ANTENNAE "antennae"
+/// One can breath under water, you get me?
+#define TRAIT_WATER_BREATHING "water_breathing"
+
 
 //non-mob traits
 /// Used for limb-based paralysis, where replacing the limb will fix it.
